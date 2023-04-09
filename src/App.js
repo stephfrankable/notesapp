@@ -2,6 +2,7 @@ import './App.css';
 import { useEffect, useReducer } from 'react';
 import { API } from 'aws-amplify';
 import { listNotes } from './graphql/queries';
+import { onCreateNote } from './graphql/subscriptions';
 import { v4 as uuid } from 'uuid';
 import { List, Input, Button } from 'antd';
 import { createNote as CreateNote,
@@ -67,7 +68,7 @@ const App = () => {
     }
   }
 
-  const updateNote = async () => {
+  const updateNote = async (note) => {
     const index = state.notes.findIndex(n => n.id === note.id)
     const notes = [...state.notes]
     notes[index].completed = !note.completed
@@ -106,6 +107,17 @@ const App = () => {
 
   useEffect(() => {
     fetchNotes()
+    const subscription = API.graphql({
+      query: onCreateNote
+    })
+      .subscribe({
+        next: noteData => {
+          const note = noteData.value.data.onCreateNote
+          if (CLIENT_ID === note.cliendId) return
+          dispatch({ type: 'ADD_NOTE', note })
+        }
+      })
+      return () => subscription.unsubscribe()
   }, [])
 
   const styles = {
