@@ -120,6 +120,9 @@ const App = () => {
       return () => subscription.unsubscribe()
   }, [])
 
+  const totalNotes = state.notes.length;
+  const completedNotes = state.notes.filter(n => n.completed).length;
+
   const styles = {
     container: {padding: 20},
     input: {marginBottom: 10},
@@ -134,7 +137,7 @@ const App = () => {
         actions={[
           <p style={styles.p} onClick={() => deleteNote(item)}>Delete</p>,
           <p style={styles.p} onClick={() => updateNote(item)}>
-            {item.completed ? 'completed' : 'mark completed'}
+            {item.completed ? 'Completed' : 'mark completed'}
           </p>
         ]}
       >
@@ -171,9 +174,12 @@ const App = () => {
         dataSource={state.notes}
         renderItem={renderItem}
        />
+       <hr />
+       <h3>
+        { totalNotes } Total Notes | { completedNotes } Notes Completed
+       </h3>
     </div>
   )
-
 }
 
 export default App;
